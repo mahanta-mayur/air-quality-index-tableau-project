@@ -1,0 +1,260 @@
+---
+title: "Project_Group11"
+output: html_notebook
+---
+
+#installing packages
+install.packages("readxl")
+install.packages("tidyr")
+
+#attaching module libraries
+library(dplyr)
+library(readxl)
+library(tidyr)
+
+```{r}
+#-------------------------[ DATA PREPROCESSING STEPS ]--------------------------
+#--------------------------[ 1. IMPORTING DATASET ]-----------------------------
+
+# Read data
+df <- read_excel("/Users/tataurosetta/Downloads/rStudio Working Directory/RStudio Datasets/AirQualityUCI.xlsx")
+
+#viewing default dataset
+View(df)
+
+# Checking datatypes of individual columns
+str(df)
+
+# Checking summary of the dataset
+summary(df)
+
+# Check for missing values
+sum(is.na(df))
+
+#--------------------------[ 2. HANDLING MISSING DATA ]-------------------------
+
+# Changing -200 value to null value
+df[df == -200] = NA
+
+# Checking summary of the dataset after replacing -200 (or missing values)
+#with NA 
+summary(df)
+
+#Viewing dataset after replacing -200 (or missing values) with NA
+View(df)
+
+#---[ 3. Replace the missing data with the average of the feature in which the data
+#is missing: ]------------------------------------------------------------------
+
+# Imputing mean for NA values
+df <- df %>% 
+  mutate_if(is.numeric, ~replace_na(.,mean(., na.rm = TRUE)))
+
+# Checking summary of the dataset after replacing NA with mean of data
+summary(df)
+
+View(df)
+
+```
+
+# After the necessary steps taken in data preprocessing above,
+# we are performing visualizations on the features of the AirQualityIndex data
+
+# Below is the code for plotting a box plot on the features
+
+```{r}
+
+#boxplot
+
+#defining colors for all the elements
+myColors <- c('steelblue','red','orange','yellow','green','blue','gold',
+              'violet','purple','pink')
+
+#defining legend labels
+elements <- c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", "NOx", "PT08.S3",
+              "NO2", "PT08.S4", "PT08.S5")
+
+#------------[ plotting the side-side box plot on a normal scale ]--------------
+
+boxplot_normal_scale <- boxplot(df$"CO(GT)", df$"PT08.S1(CO)", 
+            df$"NMHC(GT)", df$"C6H6(GT)", df$"PT08.S2(NMHC)", 
+            df$"NOx(GT)", df$"PT08.S3(NOx)", df$"NO2(GT)",
+            df$"PT08.S4(NO2)", df$"PT08.S5(O3)", names=elements, 
+            horizontal = FALSE, 
+            main = "Box Plot for all elements (Normal Scale)",
+            xlab = "Elements", 
+            ylab = "Hourly Measured Concentration in microg/m^3 & ppb",
+            cex.axis = 0.59, cex.lab = 1.0, col=myColors, outcex = 0.62)
+
+#defining the legend of the plot
+legend("topleft", legend = c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", 
+                  "NOx", "PT08.S3", "NO2", "PT08.S4", "PT08.S5"),
+                  col = c('steelblue','red','orange','yellow','green','blue',
+                  'gold','violet','purple','pink'), bty = "o", 
+                  pch=20 , pt.cex = 3, cex = 0.7, horiz = FALSE, inset=0)
+
+
+
+```
+#  In the above diagram, a side-by-side box plot has been plotted for the features
+#  from our data, more precisely only the elements sensed using metal oxide 
+#  chemical sensory devices or sensors. The features that are relevant to this box
+#  plot are CO(GT) [ Carbon Monoxide ], PT08.S1(CO) [ Tin Oxide (CO Nominally Targeted) ], 
+#  NMHC(GT) [Nonmethane hydrocarbons ( NMHC, such as ethane, ethene, propane, propene, and isoprene ) ],
+#  C6H6(GT) [ Benzene ], PT08.S2(NMHC) [ Titania ( NMHC Nominally Targeted)], 
+#  NOx(GT) [ Nitric Oxide ], PT08.S3(NOx) [ Tungsten Oxide (NOx Nominally Targeted)],
+#  NO2(GT) [ Nitrogen Dioxide ], PT08.S4(NO2) [ Tungsten Oxide (NO2 Nominally Targeted) ],
+#  PT08.S5(O3) [ Indium Oxide (O3 Nominally Targeted) ]. The features are measured in
+#  microg/m^3. As the box plot has been drawn, the first observations are telling us
+#  there are a lot of outliers for each and every element/feature/column. Also elements
+#  like CO and NO2 are visually undecipherable due to the scale on the y-axis. So before any
+#  further interpretations are made, we need to remove the outliers and add log to the scale
+#  for convenience in understanding the individual box distrbitutions for each element.
+
+```{r}
+
+#defining colors for all the elements
+myColors <- c('steelblue','red','orange','yellow','green','blue','gold',
+              'violet','purple','pink')
+
+#defining legend labels
+elements <- c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", "NOx", "PT08.S3",
+              "NO2", "PT08.S4", "PT08.S5")
+
+#---------[ plotting the side-side box plot on the logarithmic scale ]----------
+
+boxplot_log_scale <- boxplot(df$"CO(GT)", df$"PT08.S1(CO)", 
+            df$"NMHC(GT)", df$"C6H6(GT)", df$"PT08.S2(NMHC)", 
+            df$"NOx(GT)", df$"PT08.S3(NOx)", df$"NO2(GT)",
+            df$"PT08.S4(NO2)", df$"PT08.S5(O3)",
+            log = "y", names=elements, horizontal = FALSE, 
+            main = "Box Plot for all elements (Logarithmic scale)",
+            xlab = "Elements", 
+            ylab = "Hourly Measured Concentration in microg/m^3 & ppb",
+            cex.axis = 0.59, cex.lab = 1.0, col=myColors, outcex = 0.62)
+
+#defining the legend of the plot
+legend("topleft", legend = c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", 
+                  "NOx", "PT08.S3", "NO2", "PT08.S4", "PT08.S5"),
+                  col = c('steelblue','red','orange','yellow','green','blue',
+                  'gold','violet','purple','pink'), bty = "o", 
+                  pch=20 , pt.cex = 3, cex = 0.7, horiz = FALSE, inset=0)
+
+```
+# Here, in this side-by-side box plot, we have added log to the y-scale for better
+# understanding of individual box distribututions ( specially for elements like -
+# CO(GT), NMHC(GT), C6H6(GT) and NO2(GT) ). As we can see, the box distributions are
+# now visible for the above mentioned elements. However, the outliers are still present,
+# and which we have eliminated from the plot using the code below and have displayed
+# the final side-by-side box plot of our data for interpretations:
+
+```{r}
+
+
+#defining colors for all the elements
+myColors <- c('steelblue','red','orange','yellow','green','blue','gold',
+              'violet','purple','pink')
+
+#defining legend labels
+elements <- c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", "NOx", "PT08.S3",
+              "NO2", "PT08.S4", "PT08.S5")
+
+#---------[ plotting the side-side box plot without the outliers (only from)
+#the plot ]---------------------------------------------------------------------
+  
+#Vertical 
+  
+boxplot_no_outliers <- boxplot(df$"CO(GT)", df$"PT08.S1(CO)", 
+            df$"NMHC(GT)", df$"C6H6(GT)", df$"PT08.S2(NMHC)", 
+            df$"NOx(GT)", df$"PT08.S3(NOx)", df$"NO2(GT)",
+            df$"PT08.S4(NO2)", df$"PT08.S5(O3)",
+            log = "y", names=elements, horizontal = FALSE, 
+            main = "Box Plot for all elements (Logarithmic scale) (Outliers Removed)",
+            xlab = "Elements", 
+            ylab = "Hourly Measured Concentration in microg/m^3 & ppb",
+            cex.axis = 0.59, cex.lab = 1.0, col=myColors,
+            outcex = 0.62, outline = FALSE)
+
+#defining the legend of the plot
+legend("topleft", legend = c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", 
+                  "NOx", "PT08.S3", "NO2", "PT08.S4", "PT08.S5"),
+                  col = c('steelblue','red','orange','yellow','green','blue',
+                  'gold','violet','purple','pink'), bty = "o", 
+                  pch=20 , pt.cex = 3, cex = 0.7, horiz = FALSE, inset=0)
+
+
+#---------[ plotting the side-side box plot without the outliers (only from)
+#the plot ]---------------------------------------------------------------------
+  
+#Horizontal  
+  
+boxplot_no_outliers <- boxplot(df$"CO(GT)", df$"PT08.S1(CO)", 
+            df$"NMHC(GT)", df$"C6H6(GT)", df$"PT08.S2(NMHC)", 
+            df$"NOx(GT)", df$"PT08.S3(NOx)", df$"NO2(GT)",
+            df$"PT08.S4(NO2)", df$"PT08.S5(O3)",
+            log = "x", names=elements, horizontal = TRUE, 
+            main = "Box Plot for all elements (Logarithmic scale) (Outliers Removed)",
+            xlab = "Hourly Measured Concentration in microg/m^3 & ppb", 
+            ylab = "Elements",
+            cex.axis = 0.59, cex.lab = 1.0, col=myColors,
+            outcex = 0.62, outline = FALSE)
+
+#defining the legend of the plot
+legend("topleft", legend = c("CO", "PT08.S1", "NMHC", "C6H6", "PT08.S2", 
+                  "NOx", "PT08.S3", "NO2", "PT08.S4", "PT08.S5"),
+                  col = c('steelblue','red','orange','yellow','green','blue',
+                  'gold','violet','purple','pink'), bty = "o", 
+                  pch=20 , pt.cex = 3, cex = 0.7, horiz = FALSE, inset=0)
+
+
+```
+#    In our final side-by-side box plot, all the outliers have been removed and the
+#    following interpretations are made:
+
+# For our final visualization, we have plotted a box plot on the relevant features, elements in our case, to give you an idea 
+# about the concentrations measured hourly in micrograms in the air quality of the concerned location. 
+
+# at first, the scale for which the box plot was to be plotted gave us distributions for some elements which could 
+# not be deciphered due to scale range. Hence we took a logarthimic scale to properly identify the distributions of all elements
+# and compare their values.
+
+# I'll start off with some of the statistical interpretations of the given box plot. 
+
+# 1. The first observation of the plot is that the dispersion for the elements [ CO(GT), C6H6(GT), and NOx(GT) ]
+#    is considerably greater than the other elements. (The interquartile range, as shown by the box lengths, is longer ).
+
+# 2. The second interpretation is that the Measure Concentration for the elements [ CO(GT), C6H6(GT), and NOx(GT) ]
+#    are significantly spanned out a lot more than for the elements [ NMHC(GT), PT08.S1(CO), PT08.S2(NMHC), PT08.S3(NOx),
+#    and PT08.S4(NO2) ] and slightly greater than for the elements [ NO2(GT) and PT08.S5(O3)] i.e., the median, 
+#    the lower quartile and the upper quartile.
+
+# 3. The longer boxes of [ CO(GT), C6H6(GT), and NOx(GT) ] represents a greater interquartile range indicating
+#    the data not be a lot reliable. Since the interquartile range represents 50% of the data closest to the median,
+#    a greater range in this section of the plot suggests that the median may not be a great indicator of central
+#    tendency.
+
+# 4. Also the longer whiskers of the elements [ CO(GT), C6H6(GT), and NOx(GT) ] means that the data for these 
+#    features has a longer range in terms of the entire sample which is also a indicatior of less reliablity.
+
+# 5. The long whiskers of the elements [ NO2(GT) and PT08.S5(O3) ] also means that the data for these features
+#    may indicate low reliability but as the boxes of these elements are not long, we can say it's more reliable
+#    than the data recorded for the elements [ CO(GT), C6H6(GT), and NOx(GT) ] as ultimately, longer whiskers are
+#    lesser of a concern than longer boxes. A broad range of possibilities but a strong likelihood of central values
+#    is more reliable to use for prediction than a moderate overall range with little concentration at the median.
+
+# 6. The box for the elements [ CO(GT) and C6H6(GT) ] skewed. It is clearly left-skew, with a long tail 
+#    to the left (high values), and also by the fact that the left part of the box (median to upper quartile)
+#    is longer than the right part.
+
+# 7. The box for the elements [ C6H6(GT) and PT08.S5(O3) ] is not symmetric, and its pattern of skewness is
+#    slightly left-skew. It shows that the left whisker is longer than the right whisker and the left part of
+#    the box is slightly longer than the right part.
+
+# 8. The observation that can be inferred from the above plot is that the elements PT08.S1(CO) 
+#    [ Tin Oxide (CO Nominally Targeted) ], PT08.S2(NMHC) [ Titania ( NMHC Nominally Targeted)], PT08.S3(NOx)
+#    [ Tungsten Oxide (NOx Nominally Targeted)], NO2(GT) [ Nitrogen Dioxide ], PT08.S4(NO2) 
+#    [ Tungsten Oxide (NO2 Nominally Targeted) ], PT08.S5(O3) [ Indium Oxide (O3 Nominally Targeted) ] are
+#    found to be present in high concentrations at the location where the data was collected (or the elements
+#    sensed using the metal oxide sensors). These mentioned elements are really hazardous to both living beings
+#    and the climate and sadfety measures to reduce there concentrations needs to be taken immediately.
+
