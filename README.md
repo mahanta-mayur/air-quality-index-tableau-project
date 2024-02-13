@@ -9,7 +9,7 @@ This project focuses on analyzing air quality data using Tableau for visualizati
 - **Attribute Characteristics**: Real
 - **Instances**: 9358
 - **Attributes**: 15, including sensor responses and ground truth concentrations of various pollutants.
-
+  
 ## Data Preprocessing
 The dataset had instances with missing values marked as -200. These were replaced with the mean of the respective columns to maintain data integrity and facilitate accurate analysis.
 
